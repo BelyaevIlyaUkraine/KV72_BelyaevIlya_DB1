@@ -71,6 +71,7 @@ TABLESPACE pg_default;
 ALTER TABLE public."Session"
     OWNER to postgres;
 ` ` `4)Фільм
+
 ` ` `
 CREATE TABLE public."Film"
 (
