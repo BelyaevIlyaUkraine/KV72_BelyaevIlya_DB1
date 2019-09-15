@@ -12,7 +12,6 @@
 1)Мережа
 
 ` ` `
-
 CREATE TABLE public."Network"
 (
     "Name" text COLLATE pg_catalog."default" NOT NULL,
