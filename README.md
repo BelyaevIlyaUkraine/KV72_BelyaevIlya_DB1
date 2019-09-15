@@ -11,7 +11,7 @@
 
 ` ` `1)Мережа` ` `
 
-CREATE TABLE public."Network"
+` ` `CREATE TABLE public."Network"
 (
     "Name" text COLLATE pg_catalog."default" NOT NULL,
     "Owner" text COLLATE pg_catalog."default" NOT NULL,
@@ -23,11 +23,9 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE public."Network"
-    OWNER to postgres;
+    OWNER to postgres;` ` `
     
-` ` `
-2)Кінотеатр
-` ` `
+` ` `2)Кінотеатр` ` `
 
 CREATE TABLE public."Cinema"
 (
