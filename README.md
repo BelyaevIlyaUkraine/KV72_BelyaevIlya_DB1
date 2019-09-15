@@ -8,7 +8,9 @@
 Варіант(2): Мережі кінотеатрів
 
 Сутності:
+
 1)Мережа
+
 CREATE TABLE public."Network"
 (
     "Name" text COLLATE pg_catalog."default" NOT NULL,
@@ -22,7 +24,9 @@ TABLESPACE pg_default;
 
 ALTER TABLE public."Network"
     OWNER to postgres;
+
 2)Кінотеатр
+
 CREATE TABLE public."Cinema"
 (
     "Network" text COLLATE pg_catalog."default" NOT NULL,
@@ -42,7 +46,9 @@ TABLESPACE pg_default;
 
 ALTER TABLE public."Cinema"
     OWNER to postgres;
+
 3)Сеанс
+
 CREATE TABLE public."Session"
 (
     "Id" integer NOT NULL DEFAULT nextval('"Session_Id_seq"'::regclass),
@@ -62,7 +68,9 @@ TABLESPACE pg_default;
 
 ALTER TABLE public."Session"
     OWNER to postgres;
+
 4)Фільм
+
 CREATE TABLE public."Film"
 (
     "Id" integer NOT NULL DEFAULT nextval('"Film_Id_seq"'::regclass),
