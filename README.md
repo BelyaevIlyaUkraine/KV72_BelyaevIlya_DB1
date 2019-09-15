@@ -10,8 +10,7 @@
 Сутності:
 
 1)Мережа
-
-` `
+` ` `
 CREATE TABLE public."Network"
 (
     "Name" text COLLATE pg_catalog."default" NOT NULL,
@@ -25,10 +24,9 @@ TABLESPACE pg_default;
 
 ALTER TABLE public."Network"
     OWNER to postgres;
-` ` 
+` ` `
 
 2)Кінотеатр
-
 ` ` `
 CREATE TABLE public."Cinema"
 (
@@ -52,7 +50,6 @@ ALTER TABLE public."Cinema"
 ` ` `
 
 3)Сеанс
-
 ` ` `
 CREATE TABLE public."Session"
 (
@@ -74,9 +71,7 @@ TABLESPACE pg_default;
 ALTER TABLE public."Session"
     OWNER to postgres;
 ` ` `
-
 4)Фільм
-
 ` ` `
 CREATE TABLE public."Film"
 (
