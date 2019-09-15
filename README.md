@@ -23,7 +23,7 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE public."Network"
-    OWNER to postgres;` ` `
+    OWNER to postgres;
     
 ` ` `2)Кінотеатр` ` `
 
