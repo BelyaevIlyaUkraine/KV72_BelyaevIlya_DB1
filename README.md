@@ -11,7 +11,7 @@
 
 ` ` `1)Мережа` ` `
 
-` ` `CREATE TABLE public."Network"` ` `
+CREATE TABLE public."Network"
 (
     "Name" text COLLATE pg_catalog."default" NOT NULL,
     "Owner" text COLLATE pg_catalog."default" NOT NULL,
@@ -47,9 +47,7 @@ TABLESPACE pg_default;
 ALTER TABLE public."Cinema"
     OWNER to postgres;
     
-` ` `
-3)Сеанс
-` ` `
+` ` `3)Сеанс` ` `
 
 CREATE TABLE public."Session"
 (
@@ -71,9 +69,7 @@ TABLESPACE pg_default;
 ALTER TABLE public."Session"
     OWNER to postgres;
     
-` ` `
-4)Фільм
-` ` `
+` ` `4)Фільм` ` `
 
 CREATE TABLE public."Film"
 (
