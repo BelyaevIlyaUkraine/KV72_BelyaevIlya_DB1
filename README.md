@@ -73,6 +73,7 @@ ALTER TABLE public."Session"
 ` ` `
 4)Фільм
 ` ` `
+
 CREATE TABLE public."Film"
 (
     "Id" integer NOT NULL DEFAULT nextval('"Film_Id_seq"'::regclass),
