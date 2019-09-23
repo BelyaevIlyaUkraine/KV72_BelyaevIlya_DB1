@@ -20,9 +20,9 @@
 WITH (
     OIDS = FALSE
 )
-TABLESPACE pg_default;
+TABLESPACE pg_default;` ` `
 
-ALTER TABLE public."Network"
+` ` `ALTER TABLE public."Network"
     OWNER to postgres;` ` `
     
 ` ` `2)Кінотеатр` ` `
