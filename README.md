@@ -21,7 +21,7 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;` ` `
-` ` `` ` `
+
 ` ` `ALTER TABLE public."Network"
     OWNER to postgres;` ` `
     
