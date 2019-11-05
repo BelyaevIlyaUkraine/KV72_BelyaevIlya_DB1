@@ -16,4 +16,4 @@
 ![alt text](https://github.com/BelyaevIlyaUkraine/KV72_BelyaevIlya_DB/blob/master/LAB2/Table%20Network%20after%20deleting.JPG)
 
 Таблиця Cinema після вилучення запису
-![alt text](https://github.com/BelyaevIlyaUkraine/KV72_BelyaevIlya_DB/blob/master/LAB2/Table%20Cinema%20after%20deleting.JPG)
+-![alt text](https://github.com/BelyaevIlyaUkraine/KV72_BelyaevIlya_DB/blob/master/LAB2/Table%20Cinema%20after%20deleting.JPG)
