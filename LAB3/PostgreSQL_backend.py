@@ -1,4 +1,7 @@
 import psycopg2
+from sqlalchemy import *
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 
 def scrub(input_string):
@@ -110,9 +113,9 @@ def update_item(cursor, table_name, list):
 
 
 def connect_to_db():
-    connection = psycopg2.connect(dbname="Cinema Networks", user="postgres", password="01052000x",
-                                  host="127.0.0.1", port="5555")
-    return connection
+    engine = create_engine("postgresql+psycopg2://postgres:01052000x@127.0.0.1:5555/Cinema Networks", echo=False)
+
+    return engine
 
 
 def disconnect_from_db(connection,cursor):
