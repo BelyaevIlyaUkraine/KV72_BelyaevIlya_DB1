@@ -41,7 +41,7 @@ def insert_one_orm(Session,list):
 
     session = Session()
     film = Film(Name = list[0], Genre = list[1], Year = list[2], Budget = list[3], Country = list[4], Duration = list[5]
-                ,Oscar = list[6])
+                ,Oscar = Boolean(list[6]))
     session.add(film)
     session.commit()
     session.close()
@@ -127,11 +127,6 @@ def update_item(cursor, table_name, list):
     elif table_name == "Session":
         cursor.execute("""UPDATE "Session" SET "Start" = '{}' ,"Film" = '{}', "HallNumber" = '{}' WHERE 
             "ID" = '{}'  """.format(list[1], list[2], list[3], list[0]))
-
-    elif table_name == "Film":
-        cursor.execute("""UPDATE "Film" SET "Name" = '{}',"Genre" = '{}',"Year" = '{}',"Budget" = '{}',
-            "Country" = '{}' ,"Duration" = '{}' WHERE "ID" = '{}' """
-                       .format(list[1], list[2], list[3], list[4], list[5], list[6], list[0]))
 
     elif table_name == "Cinema-Session":
         cursor.execute("""UPDATE "Cinema-Session" SET "CinemaID" = '{}',"SessionID" = '{}'

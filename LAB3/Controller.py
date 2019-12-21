@@ -10,7 +10,7 @@ class Controller(object):
     def show_items(self):
         items = self.model.read_items()
         if self.model.present_table_type == "Film":
-            if items.count():
+            if items.count:
                 self.view.table_rows_display_orm(items)
                 return
         elif items.rowcount:
@@ -273,107 +273,114 @@ class Controller(object):
         if len(bound_check) > 1:
             if bound_check[1] == "Lower" or bound_check[1] == "Upper":
                 attr_name = bound_check[0]
-            if attr_name.find("table") != -1:
-                if (attr_value == "Network" or attr_value =="Cinema" or attr_value == "Session"
-                or attr_value == "Cinema-Session" or  attr_value == "Film"):
+        if attr_name.find("table") != -1:
+            if (attr_value == "Network" or attr_value == "Cinema" or attr_value == "Session"
+                    or attr_value == "Cinema-Session" or attr_value == "Film"):
+                return True
+            return False
+        if attr_name == "ID":
+            if attr_value.isdecimal():
+                return True
+        elif attr_name == "Year":
+            if attr_value.isdecimal():
+                return True
+        elif attr_name == "Budget":
+            li = list(attr_value.split(" "))
+            if len(li) == 2:
+                if li[0].isdecimal() and (li[1] == "UAH" or li[1] == "USD" or li[1] == "EUR" or li[1] == "GBP"):
                     return True
-                return False
-            if attr_name == "ID":
-                if attr_value.isdecimal():
+        elif attr_name == "Duration":
+            li = list(attr_value.split(" "))
+            if len(li) == 2:
+                if li[0].isdecimal() and li[1] == "min":
                     return True
-            elif attr_name == "Year":
-                if attr_value.isdecimal():
-                    return True
-            elif attr_name == "Budget":
-                li = list(attr_value.split(" "))
-                if len(li) == 2:
-                    if li[0].isdecimal() and (li[1] == "UAH" or li[1] == "USD" or li[1] == "EUR" or li[1] == "GBP"):
+        elif attr_name == "Start":
+            li = list(attr_value.split(" "))
+            if len(li) == 2:
+                li_data = list(li[0].split("-"))
+                li_time = list(li[1].split(":"))
+                if (li_data[0].isdecimal() and li_data[1].isdecimal and li_data[2].isdecimal() and li_time[
+                    0].isdecimal()
+                        and li_time[1].isdecimal() and li_time[2].isdecimal()):
+                    if '13' > li_data[1] and li_data[2] < '31' and li_time[0] < '24' and li_time[1] < '60' and li_time[
+                        2] < '60':
                         return True
-            elif attr_name == "Duration":
-                li = list(attr_value.split(" "))
-                if len(li) == 2:
-                    if li[0].isdecimal() and li[1] == "min":
-                        return True
-            elif attr_name == "Start":
-                li = list(attr_value.split(" "))
-                if len(li) == 2:
-                    li_data = list(li[0].split("-"))
-                    li_time = list(li[1].split(":"))
-                    if (li_data[0].isdecimal() and li_data[1].isdecimal and li_data[2].isdecimal() and li_time[0].isdecimal()
-                    and li_time[1].isdecimal() and li_time[2].isdecimal()):
-                        if '13' > li_data[1] and li_data[2]<'31' and li_time[0]<'24' and li_time[1]<'60' and li_time[2]<'60':
-                            return True
-            elif attr_name == "HallNumber":
-                if attr_value.isdecimal():
-                    return True
-            elif attr_name == "Film":
-                if attr_value.isdecimal():
-                    return True
-            elif attr_name == "NumberOfHalls":
-                if attr_value.isdecimal():
-                    return True
-            elif attr_name == "GenNumberOfSeats":
-                if attr_value.isdecimal():
-                    return True
-            elif attr_name == "Name":
-                li = list(attr_value.split(" "))
-                for item in li:
-                    if not item.isalnum():
+        elif attr_name == "HallNumber":
+            if attr_value.isdecimal():
+                return True
+        elif attr_name == "Film":
+            if attr_value.isdecimal():
+                return True
+        elif attr_name == "NumberOfHalls":
+            if attr_value.isdecimal():
+                return True
+        elif attr_name == "GenNumberOfSeats":
+            if attr_value.isdecimal():
+                return True
+        elif attr_name == "Name":
+            li = list(attr_value.split(" "))
+            for item in li:
+                if not item.isalnum():
+                    return False
+            return True
+        elif attr_name == "Owner":
+            li = list(attr_value.split(" "))
+            for item in li:
+                if not item.isalpha() or not item[0].isupper:
+                    return False
+            return True
+        elif attr_name == "Network":
+            li = list(attr_value.split(" "))
+            for item in li:
+                if not item.isalnum():
+                    return False
+            return True
+        elif attr_name == "Address":
+            li = list(attr_value.split(","))
+            if len(li) == 3:
+                li0 = li[0].split(" ")
+                for part in li0:
+                    if not part.isalpha():
                         return False
-                return True
-            elif attr_name == "Owner":
-                li = list(attr_value.split(" "))
-                for item in li:
-                    if not item.isalpha() or not item[0].isupper:
+                li1 = li[1].split(" ")
+                for part in li1:
+                    if not part.isalpha():
                         return False
+                if li[2].isdecimal():
+                    return True
+            return False
+        elif attr_name == "Genre":
+            li = list(attr_value.split(" "))
+            for item in li:
+                if not item.isalnum():
+                    return False
+            return True
+        elif attr_name == "Country":
+            li = list(attr_value.split(" "))
+            for item in li:
+                if not item.isalpha():
+                    return False
+            return True
+        elif attr_name == "Oscar":
+            if attr_value == "True" or attr_value == "False":
                 return True
-            elif attr_name == "Network":
-                li = list(attr_value.split(" "))
-                for item in li:
-                    if not item.isalnum():
+            return False
+        elif attr_name == "CinemaID":
+            if attr_value.isdecimal():
+                return True
+            return False
+        elif attr_name == "SessionID":
+            if attr_value.isdecimal():
+                return True
+            return False
+        elif attr_name == "Phrase":
+            return True
+        elif attr_name == "Words":
+            words = list(attr_value.split(","))
+            for word in words:
+                subwords = list(word.split(" "))
+                for subword in subwords:
+                    if not subword.isalnum():
                         return False
-                return True
-            elif attr_name == "Address":
-                li = list(attr_value.split(","))
-                if len(li) == 3:
-                    li0 = li[0].split(" ")
-                    for part in li0:
-                        if not part.isalpha():
-                            return False
-                    li1 = li[1].split(" ")
-                    for part in li1:
-                        if not part.isalpha():
-                            return False
-                    if li[2].isdecimal():
-                        return True
-                return False
-            elif attr_name == "Genre":
-                if attr_value.isalpha():
-                    return True
-            elif attr_name == "Country":
-                if attr_value.isalpha():
-                    return True
-            elif attr_name == "Oscar":
-                if attr_value == "True" or attr_value == "False":
-                    return True
-                return False
-            elif attr_name == "CinemaID":
-                if attr_value.isdecimal():
-                    return True
-                return False
-            elif attr_name == "SessionID":
-                if attr_value.isdecimal():
-                    return True
-                return False
-            elif attr_name == "Phrase":
-                return True
-            elif attr_name == "Words":
-                words = list(attr_value.split(","))
-                for word in words:
-                    subwords = list(word.split(" "))
-                    for subword in subwords:
-                        if not subword.isalnum():
-                            return False
-                return True
-
+            return True
 
