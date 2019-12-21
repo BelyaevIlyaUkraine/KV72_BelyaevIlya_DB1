@@ -1,7 +1,9 @@
+from Models import *
 import psycopg2
-from sqlalchemy import *
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import *
+from sqlalchemy import inspect,create_engine
+from sqlalchemy import Boolean, BOOLEAN
+from sqlalchemy.exc import NoInspectionAvailable
 
 
 def scrub(input_string):
@@ -32,14 +34,20 @@ def insert_one(cursor, table_name, list):
         cursor.execute("""INSERT INTO "Session" ("Start","Film","HallNumber") 
             VALUES ('{}', '{}', '{}')""".format (list[0], list[1], list[2]))
 
-    elif table_name == "Film":
-        cursor.execute("""INSERT INTO "Film" ("Name","Genre","Year","Budget","Country","Duration","Oscar") 
-        VALUES ('{}','{}','{}','{}','{}','{}','{}')""".format(list[0], list[1], list[2],
-                                                              list[3], list[4], list[5], list[6]))
-
     else:
         cursor.execute("""INSERT INTO "Cinema-Session" ("CinemaID","SessionID") 
             VALUES ('{}', '{}')""".format(list[0], list[1]))
+
+
+def insert_one_orm(Session,table_name,list):
+    table_name = scrub(table_name)
+
+    session = Session()
+    film = Film(Name = list[0], Genre = list[1], Year = list[2], Budget = list[3], Country = list[4], Duration = list[5]
+                ,Oscar = list[6])
+    session.add(film)
+    session.commit()
+    session.close()
 
 
 def select_all(cursor, table_name):
@@ -48,6 +56,16 @@ def select_all(cursor, table_name):
     cursor.execute(""" SELECT * FROM "{}" """.format(table_name))
 
     return cursor
+
+
+def select_all_orm(Session, table_name):
+    table_name = scrub(table_name)
+
+    session = Session()
+    films = session.query(Film).all()
+    session.close()
+
+    return films
 
 
 def delete_one(cursor, table_name, pr_key):
@@ -113,9 +131,14 @@ def update_item(cursor, table_name, list):
 
 
 def connect_to_db():
-    engine = create_engine("postgresql+psycopg2://postgres:01052000x@127.0.0.1:5555/Cinema Networks", echo=False)
+    connection = psycopg2.connect(dbname="Cinema Networks", user="postgres", password="01052000x",
+                                  host="127.0.0.1", port="5555")
+    return connection
 
-    return engine
+def connect_to_db_orm():
+    engine = create_engine('postgresql+psycopg2://postgres:01052000x@127.0.0.1:5555/Cinema Networks')
+    session_class = sessionmaker(bind=engine)
+    return session_class
 
 
 def disconnect_from_db(connection,cursor):

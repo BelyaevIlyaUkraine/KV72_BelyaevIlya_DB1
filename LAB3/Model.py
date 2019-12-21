@@ -3,12 +3,22 @@ import PostgreSQL_backend
 
 class ModelPostgreSQL(object):
     def __init__(self):
-        self._engine = PostgreSQL_backend.connect_to_db()
+        self._connection = PostgreSQL_backend.connect_to_db()
+        self._orm_session = PostgreSQL_backend.connect_to_db_orm()
         self._present_table_type = ''
+        self._cursor = self.connection.cursor()
 
     @property
-    def engine(self):
-        return self._engine
+    def connection(self):
+        return self._connection
+
+    @property
+    def cursor(self):
+        return self._cursor
+
+    @property
+    def orm_session(self):
+        return self.orm_session
 
     @property
     def present_table_type(self):
@@ -19,22 +29,25 @@ class ModelPostgreSQL(object):
         self._present_table_type = new_present_table_type
 
     def create_item(self,cortage):
-        PostgreSQL_backend.insert_one(self.present_table_type,cortage)
+        if self.present_table_type == "Film":
+            PostgreSQL_backend.insert_one_orm(self.orm_session,self.present_table_type,cortage)
+        else:
+            PostgreSQL_backend.insert_one(self.cursor,self.present_table_type,cortage)
 
     def read_items(self):
-        return PostgreSQL_backend.select_all(self.present_table_type)
+        return PostgreSQL_backend.select_all(self.cursor,self.present_table_type)
 
     def update_item(self, list):
-        PostgreSQL_backend.update_item(self.present_table_type, list)
+        PostgreSQL_backend.update_item(self.cursor, self.present_table_type, list)
 
     def delete_item(self,pr_key):
-        return PostgreSQL_backend.delete_one(self.present_table_type,pr_key)
+        return PostgreSQL_backend.delete_one(self.cursor,self.present_table_type,pr_key)
 
     def delete_all(self):
-        return PostgreSQL_backend.delete_all(self.present_table_type)
+        return PostgreSQL_backend.delete_all(self.cursor,self.present_table_type)
 
     def disconnect_from_db(self):
-        PostgreSQL_backend.disconnect_from_db(self.engine)
+        PostgreSQL_backend.disconnect_from_db(self.connection,self.cursor)
 
     def search_item(self,item,pr_key_mode,not_default_table=None):
         if pr_key_mode:

@@ -9,7 +9,11 @@ class Controller(object):
 
     def show_items(self):
         items = self.model.read_items()
-        if items.rowcount:
+        if self.model.present_table_type == "Film":
+            if items.count():
+                self.view.table_rows_display_orm(items)
+                return
+        elif items.rowcount:
             self.view.table_rows_display(items)
             return
         self.view.message_print("This table was already empty\n")

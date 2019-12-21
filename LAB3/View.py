@@ -41,6 +41,12 @@ class View(object):
             row = cursor.fetchone()
 
     @staticmethod
+    def table_rows_display_orm(items):
+        for film in items:
+            print("({},{},{},{},{},{},{})\n".format(film.Name,film.Genre,film.Year,film.Budget,film.Country,
+                                                    film.Duration,film.Oscar))
+
+    @staticmethod
     def question_about_end_display():
         print("Continue to work with Database?(Y/N)\n")
 
