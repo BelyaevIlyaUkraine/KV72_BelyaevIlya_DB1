@@ -39,8 +39,7 @@ def insert_one(cursor, table_name, list):
             VALUES ('{}', '{}')""".format(list[0], list[1]))
 
 
-def insert_one_orm(Session,table_name,list):
-    table_name = scrub(table_name)
+def insert_one_orm(Session,list):
 
     session = Session()
     film = Film(Name = list[0], Genre = list[1], Year = list[2], Budget = list[3], Country = list[4], Duration = list[5]
@@ -58,9 +57,7 @@ def select_all(cursor, table_name):
     return cursor
 
 
-def select_all_orm(Session, table_name):
-    table_name = scrub(table_name)
-
+def select_all_orm(Session):
     session = Session()
     films = session.query(Film).all()
     session.close()
@@ -80,9 +77,6 @@ def delete_one(cursor, table_name, pr_key):
     def delete_one_session():
         cursor.execute("""DELETE FROM "Session" WHERE "ID" = '{}' """.format(pr_key))
 
-    def delete_one_film():
-        cursor.execute("""DELETE FROM "Film" WHERE "ID" = '{}' """.format(pr_key))
-
     def delete_one_cinema_session():
         cursor.execute("""DELETE FROM "Cinema-Session" WHERE "ID" = '{}' """.format(pr_key))
 
@@ -92,18 +86,29 @@ def delete_one(cursor, table_name, pr_key):
         delete_one_cinema()
     elif table_name == "Session":
         delete_one_session()
-    elif table_name == "Film":
-        delete_one_film()
     elif table_name == "Cinema-Session":
         delete_one_cinema_session()
 
     return cursor.rowcount
 
 
+def delete_one_orm(Session,pr_key):
+    session = Session()
+    film = session.query(Film).filter(Film.ID == pr_key).first()
+    session.delete(film)
+    session.commit()
+    session.close()
+
 def delete_all(cursor,table_name):
     cursor.execute("""DELETE FROM "{}" """.format(table_name))
     return cursor.rowcount
 
+def delete_all_orm(Session):
+    session = Session()
+    films = session.query(Film).all()
+    session.delete(films)
+    session.commit()
+    session.close()
 
 def update_item(cursor, table_name, list):
     if table_name == "Network":
@@ -128,6 +133,15 @@ def update_item(cursor, table_name, list):
             WHERE "ID" = '{}' """.format(list[1], list[2], list[0]))
 
     return cursor.rowcount
+
+
+def update_item_orm(Session,list):
+    session = Session()
+    film = session.query(Film).filter(Film.ID == list[0]).first()
+    film.Name,film.Genre,film.Year,film.Budget,film.Country,film.Duration = list[1],list[2],list[3],list[4],list[5],\
+                                                                            list[6]
+    session.commit()
+    session.close()
 
 
 def connect_to_db():

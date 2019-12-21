@@ -30,7 +30,7 @@ class ModelPostgreSQL(object):
 
     def create_item(self,cortage):
         if self.present_table_type == "Film":
-            PostgreSQL_backend.insert_one_orm(self.orm_session,self.present_table_type,cortage)
+            PostgreSQL_backend.insert_one_orm(self.orm_session,cortage)
         else:
             PostgreSQL_backend.insert_one(self.cursor,self.present_table_type,cortage)
 
