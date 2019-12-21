@@ -1,9 +1,7 @@
 from Models import *
 import psycopg2
 from sqlalchemy.orm import *
-from sqlalchemy import inspect,create_engine
-from sqlalchemy import Boolean, BOOLEAN
-from sqlalchemy.exc import NoInspectionAvailable
+from sqlalchemy import create_engine
 
 
 def scrub(input_string):
@@ -149,6 +147,7 @@ def connect_to_db():
                                   host="127.0.0.1", port="5555")
     return connection
 
+
 def connect_to_db_orm():
     engine = create_engine('postgresql+psycopg2://postgres:01052000x@127.0.0.1:5555/Cinema Networks')
     session_class = sessionmaker(bind=engine)
@@ -161,176 +160,7 @@ def disconnect_from_db(connection,cursor):
     print("Connection with PostgreSQL is closed")
 
 
-def select_item(cursor,table_name,item,mode):
-    table_name = scrub(table_name)
-    if mode:
-        if table_name == "Cinema":
-            cursor.execute(""" SELECT * FROM "{}" WHERE "Address" = '{}' """.format(table_name, item))
-        elif table_name == "Network":
-            cursor.execute(""" SELECT * FROM "{}" WHERE "Name" = '{}' """.format(table_name,item))
-        else:
-            cursor.execute("""SELECT * FROM "{}" WHERE "ID" = '{}' """.format(table_name,item))
-    else:
-        cursor.execute("""SELECT "{}" FROM "{}" """.format(item,table_name))
-        return cursor.fetchall()
-
-    return cursor
 
 
-def static_search_film_session(cursor, list):
-    cursor.execute("""SELECT *
-                      FROM "Film" INNER JOIN "Session" ON 
-                      "Film"."ID" = "Session"."Film" WHERE "Film"."Oscar" = '{}' AND "Session"."Start" >= '{}' AND
-                      "Session"."Start" < '{}' 
-                   """.format(list[0], list[1], list[2]))
-
-    return cursor
-
-
-def text_search_full_phrase(cursor,phrase,pr_key,attribute,table_name):
-    cursor.execute(""" SELECT "{}",ts_headline( "{}", q ) FROM "{}",
-    phraseto_tsquery('{}') AS q
-    WHERE to_tsvector("{}"."{}") @@ q""".format(pr_key,attribute,table_name,phrase,table_name,attribute))
-
-    return cursor
-
-
-def text_search_without_definite_words(cursor, phrase, pr_key, attribute, table_name):
-    cursor.execute(""" SELECT "{}",ts_headline( "{}"."{}", phraseto_tsquery("{}"."{}") ) FROM "{}"
-    WHERE NOT(to_tsvector("{}"."{}") @@ to_tsquery('{}'))"""
-    .format(pr_key,table_name,attribute,table_name,attribute,table_name,table_name,attribute,phrase))
-    return cursor
-
-
-def dynamic_search(cursor,array_with_selected_attributes,cortege_with_attributes,cortege_with_table_names):
-    if len(cortege_with_attributes) == 3:
-        if array_with_selected_attributes[0].find("Bound") == -1:
-            array_with_selected_attributes[1] = array_with_selected_attributes[1].replace("Lower", "")
-            array_with_selected_attributes[1] = array_with_selected_attributes[1].replace("Bound", "")
-            array_with_selected_attributes[1] = array_with_selected_attributes[1].replace(" ", "")
-            array_with_selected_attributes[2] = array_with_selected_attributes[2].replace("Upper", "")
-            array_with_selected_attributes[2] = array_with_selected_attributes[2].replace("Bound", "")
-            array_with_selected_attributes[2] = array_with_selected_attributes[2].replace(" ", "")
-
-            if cortege_with_table_names[0] == "Cinema" and cortege_with_table_names[1] == "Session":
-                cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON EXISTS(SELECT * FROM "Cinema-Session" WHERE 
-                "Cinema-Session"."CinemaID" = "Cinema"."Address" AND 
-                "Session"."ID" = "Cinema-Session"."SessionID") AND "{}"."{}" = '{}' AND "{}"."{}" >= '{}' AND 
-                "{}"."{}" <= '{}' """
-                .format(cortege_with_table_names[0],cortege_with_table_names[1],cortege_with_table_names[0],
-                array_with_selected_attributes[0],cortege_with_attributes[0],cortege_with_table_names[1],
-                array_with_selected_attributes[1],cortege_with_attributes[1],cortege_with_table_names[1],
-                array_with_selected_attributes[2],cortege_with_attributes[2]))
-
-            elif cortege_with_table_names[0] == "Network" and cortege_with_table_names[1] == "Cinema":
-                cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON "Network"."Name" = "Cinema"."Network"
-                AND "{}"."{}" = '{}' AND "{}"."{}" >= '{}' AND "{}"."{}" <= '{}' """
-                .format(cortege_with_table_names[0], cortege_with_table_names[1],
-                cortege_with_table_names[0],array_with_selected_attributes[0], cortege_with_attributes[0],
-                cortege_with_table_names[1],array_with_selected_attributes[1], cortege_with_attributes[1],
-                cortege_with_table_names[1],array_with_selected_attributes[2], cortege_with_attributes[2]))
-
-            elif cortege_with_table_names[0] == "Film" and cortege_with_table_names[1] == "Session":
-                cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON "Film"."ID" = "Session"."Film"
-                AND "{}"."{}" = '{}' AND "{}"."{}" >= '{}' AND "{}"."{}" <= '{}' """
-                .format(cortege_with_table_names[0], cortege_with_table_names[1],
-                cortege_with_table_names[0],array_with_selected_attributes[0], cortege_with_attributes[0],
-                cortege_with_table_names[1],array_with_selected_attributes[1], cortege_with_attributes[1],
-                cortege_with_table_names[1],array_with_selected_attributes[2], cortege_with_attributes[2]))
-
-        else:
-            array_with_selected_attributes[0] = array_with_selected_attributes[0].replace("Lower", "")
-            array_with_selected_attributes[0] = array_with_selected_attributes[0].replace("Bound", "")
-            array_with_selected_attributes[0] = array_with_selected_attributes[0].replace(" ", "")
-            array_with_selected_attributes[1] = array_with_selected_attributes[1].replace("Upper", "")
-            array_with_selected_attributes[1] = array_with_selected_attributes[1].replace("Bound", "")
-            array_with_selected_attributes[1] = array_with_selected_attributes[1].replace(" ", "")
-
-            if cortege_with_table_names[0] == "Cinema" and cortege_with_table_names[1] == "Network":
-                cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON "Cinema"."Network" = "Network"."Name"
-                AND "{}"."{}" >= '{}' AND "{}"."{}" <= '{}' AND "{}"."{}" = '{}' """
-                .format(cortege_with_table_names[0], cortege_with_table_names[1],
-                cortege_with_table_names[0],array_with_selected_attributes[0], cortege_with_attributes[0],
-                cortege_with_table_names[0],array_with_selected_attributes[1], cortege_with_attributes[1],
-                cortege_with_table_names[1],array_with_selected_attributes[2], cortege_with_attributes[2]))
-
-            elif cortege_with_table_names[0] == "Session" and cortege_with_table_names[1] == "Cinema":
-                cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON EXISTS(SELECT * FROM "Cinema-Session" WHERE 
-                "Cinema-Session"."CinemaID" = "Cinema"."Address" AND "Session"."ID" = "Cinema-Session"."SessionID") 
-                AND "{}"."{}" >= '{}' AND "{}"."{}" <= '{}' AND "{}"."{}" = '{}' """
-                .format(cortege_with_table_names[0], cortege_with_table_names[1],
-                cortege_with_table_names[0], array_with_selected_attributes[0],cortege_with_attributes[0],
-                cortege_with_table_names[0], array_with_selected_attributes[1],cortege_with_attributes[1],
-                cortege_with_table_names[1], array_with_selected_attributes[2],cortege_with_attributes[2]))
-
-            elif cortege_with_table_names[0] == "Session" and cortege_with_table_names[1] == "Film":
-                cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON "Session"."Film" = "Film"."ID"
-                AND "{}"."{}" >= '{}' AND "{}"."{}" <= '{}' AND "{}"."{}" = '{}' """
-                .format(cortege_with_table_names[0], cortege_with_table_names[1],cortege_with_table_names[0],
-                array_with_selected_attributes[0], cortege_with_attributes[0],cortege_with_table_names[1],
-                array_with_selected_attributes[1], cortege_with_attributes[1],cortege_with_table_names[1],
-                array_with_selected_attributes[2], cortege_with_attributes[2]))
-    elif len(cortege_with_attributes) == 4:
-        array_with_selected_attributes[0] = array_with_selected_attributes[0].replace("Lower", "")
-        array_with_selected_attributes[0] = array_with_selected_attributes[0].replace("Bound", "")
-        array_with_selected_attributes[0] = array_with_selected_attributes[0].replace(" ", "")
-        array_with_selected_attributes[1] = array_with_selected_attributes[1].replace("Upper", "")
-        array_with_selected_attributes[1] = array_with_selected_attributes[1].replace("Bound", "")
-        array_with_selected_attributes[1] = array_with_selected_attributes[1].replace(" ", "")
-        array_with_selected_attributes[2] = array_with_selected_attributes[2].replace("Lower", "")
-        array_with_selected_attributes[2] = array_with_selected_attributes[2].replace("Bound", "")
-        array_with_selected_attributes[2] = array_with_selected_attributes[2].replace(" ", "")
-        array_with_selected_attributes[3] = array_with_selected_attributes[3].replace("Upper", "")
-        array_with_selected_attributes[3] = array_with_selected_attributes[3].replace("Bound", "")
-        array_with_selected_attributes[3] = array_with_selected_attributes[3].replace(" ", "")
-
-        if ((cortege_with_table_names[0] == "Session" and cortege_with_table_names[1] == "Film")or
-        (cortege_with_table_names[0] == "Film" and cortege_with_table_names[1] == "Session")):
-            cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON "Session"."Film" = "Film"."ID"
-            AND "{}"."{}" >= '{}' AND "{}"."{}" <= '{}'  AND "{}"."{}" >= '{}' AND "{}"."{}" <= '{}' """
-            .format(cortege_with_table_names[0], cortege_with_table_names[1], cortege_with_table_names[0],
-            array_with_selected_attributes[0], cortege_with_attributes[0],cortege_with_table_names[0],
-            array_with_selected_attributes[1], cortege_with_attributes[1],cortege_with_table_names[1],
-            array_with_selected_attributes[2], cortege_with_attributes[2],cortege_with_table_names[1],
-            array_with_selected_attributes[3], cortege_with_attributes[3]))
-
-        elif ((cortege_with_table_names[0] == "Session" and cortege_with_table_names[1] == "Cinema")or
-        (cortege_with_table_names[0] == "Cinema" and cortege_with_table_names[1] == "Session")):
-            cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON EXISTS(SELECT * FROM "Cinema-Session" WHERE 
-            "Cinema-Session"."CinemaID" = "Cinema"."Address" AND "Session"."ID" = "Cinema-Session"."SessionID") 
-            AND "{}"."{}" >= '{}' AND "{}"."{}" <= '{}' AND "{}"."{}" >= '{}' AND "{}"."{}" <= '{}' """
-            .format(cortege_with_table_names[0], cortege_with_table_names[1], cortege_with_table_names[0],
-            array_with_selected_attributes[0], cortege_with_attributes[0], cortege_with_table_names[0],
-            array_with_selected_attributes[1], cortege_with_attributes[1], cortege_with_table_names[1],
-            array_with_selected_attributes[2], cortege_with_attributes[2], cortege_with_table_names[1],
-            array_with_selected_attributes[3], cortege_with_attributes[3]))
-
-    elif len(cortege_with_attributes) == 2:
-        if ((cortege_with_table_names[0] == "Network" and cortege_with_table_names[1] == "Cinema")or
-        (cortege_with_table_names[0] == "Cinema" and cortege_with_table_names[1] == "Network")):
-            cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON "Network"."Name" = "Cinema"."Network"
-            AND "{}"."{}" = '{}' AND "{}"."{}" = '{}' """
-            .format(cortege_with_table_names[0], cortege_with_table_names[1],
-            cortege_with_table_names[0], array_with_selected_attributes[0],cortege_with_attributes[0],
-            cortege_with_table_names[1], array_with_selected_attributes[1],cortege_with_attributes[1]))
-
-        elif ((cortege_with_table_names[0] == "Film" and cortege_with_table_names[1] == "Session")or
-        (cortege_with_table_names[0] == "Session" and cortege_with_table_names[1] == "Film")):
-            cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON "Film"."ID" = "Session"."ID"
-            AND "{}"."{}" = '{}' AND "{}"."{}" = '{}' """
-            .format(cortege_with_table_names[0], cortege_with_table_names[1],
-            cortege_with_table_names[0], array_with_selected_attributes[0],cortege_with_attributes[0],
-            cortege_with_table_names[1], array_with_selected_attributes[1],cortege_with_attributes[1]))
-
-        elif ((cortege_with_table_names[0] == "Cinema" and cortege_with_table_names[1] == "Session")or
-        (cortege_with_table_names[0] == "Session" and cortege_with_table_names[1] == "Cinema")):
-            cursor.execute("""SELECT * FROM "{}" INNER JOIN "{}" ON EXISTS(SELECT * FROM "Cinema-Session" WHERE 
-            "Cinema-Session"."CinemaID" = "Cinema"."Address" AND "Session"."ID" = "Cinema-Session"."SessionID") 
-            AND "{}"."{}" = '{}' AND "{}"."{}" = '{}' """
-            .format(cortege_with_table_names[0], cortege_with_table_names[1],
-            cortege_with_table_names[0], array_with_selected_attributes[0],cortege_with_attributes[0],
-            cortege_with_table_names[1], array_with_selected_attributes[1],cortege_with_attributes[1]))
-
-    return cursor
 
 

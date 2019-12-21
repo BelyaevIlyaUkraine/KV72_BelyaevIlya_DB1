@@ -43,7 +43,7 @@ class View(object):
     @staticmethod
     def table_rows_display_orm(items):
         for film in items:
-            print("({},{},{},{},{},{},{})\n".format(film.Name,film.Genre,film.Year,film.Budget,film.Country,
+            print("({},{},{},{},{},{},{},{})\n".format(film.ID,film.Name,film.Genre,film.Year,film.Budget,film.Country,
                                                     film.Duration,film.Oscar))
 
     @staticmethod

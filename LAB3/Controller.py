@@ -24,7 +24,7 @@ class Controller(object):
             while True:
                 self.view.enter_cortege_item_display(name)
                 inp = str(input())
-                if validate_input(name, inp):
+                if self.validate_input(name, inp):
                     return_array.append(inp)
                     break
                 else:
@@ -41,16 +41,6 @@ class Controller(object):
                 return
             self.view.message_print("Error:enter one of suggested table names\n")
 
-    def action_type_select(self):
-        self.view.action_type_select_display()
-        while True:
-            action_type = str(input())
-            if action_type != "1" and action_type != "2" and action_type != "3":
-                self.view.message_print("Error:enter number from 1 to 3\n")
-                continue
-            break
-        return action_type
-
     def action_select(self):
         self.view.action_select_display()
         while True:
@@ -64,15 +54,11 @@ class Controller(object):
             elif action == "4":
                 self.delete_item()
             elif action == "5":
-                self.search_item()
+                self.delete_all()
             elif action == "6":
                 self.data_random()
-            elif action == "7":
-                self.delete_all()
-            elif action == "8":
-                self.text_attribute_search()
             else:
-                self.view.message_print("Error:Enter number from 1-8\n")
+                self.view.message_print("Error:Enter number from 1-6\n")
                 continue
             break
 
@@ -169,146 +155,6 @@ class Controller(object):
             self.view.message_print("All rows in table were deleted successfully\n")
         else:
             self.view.message_print("Table was already empty\n")
-
-    def search_item(self):
-        if self.model.present_table_type == 'Network':
-            list = self.enter_items(["Name"])
-        elif self.model.present_table_type == 'Cinema':
-            list = self.enter_items(["Address"])
-        else:
-            list = self.enter_items(["ID"])
-
-        items = self.model.search_item(list[0], True)
-        if items.rowcount == 0:
-            self.view.message_print("There aren't necessary rows for selecting in table\n")
-        self.view.table_rows_display(items)
-
-    def static_search_film_and_session(self):
-        list = self.enter_items(("Oscar", "Start Lower Bound", "Start Upper Data Bound"))
-        items = self.model.static_search_film_session(list)
-        if items.rowcount == 0:
-            self.view.message_print("There aren't any results matching input conditions\n")
-            return
-        self.view.table_rows_display(items)
-
-    def text_attribute_search(self):
-        self.view.text_search_type_select_display()
-        items = None
-        if self.model.present_table_type == "Network":
-            pr_key = "Name"
-        elif self.model.present_table_type == "Cinema":
-            pr_key = "Address"
-        elif self.model.present_table_type == "Cinema-Session":
-            pr_key = "CinemaID"
-        else:
-            pr_key = "ID"
-        while True:
-            type = str(input())
-            if type == "1":
-                attribute = self.select_attribute_for_text_search()
-                text_value = self.enter_items(["Phrase"])
-                text_value = text_value[0]
-                items = self.model.text_search_full_phrase(text_value,pr_key,attribute)
-            elif type == "2":
-                attribute = self.select_attribute_for_text_search()
-                text_value = self.enter_items(["Words"])
-                text_value = text_value[0]
-                text_value = text_value.replace(",","|")
-                text_value = text_value.replace(" ","<->")
-                items = self.model.text_search_without_word(text_value,pr_key,attribute)
-            else:
-                self.view.message_print("Error:enter number of action from 1 to 2\n")
-                continue
-            break
-        if items.rowcount == 0:
-            self.view.message_print("No text parts matching input conditions\n")
-            return
-        self.view.table_rows_display(items)
-
-    def select_attribute_for_text_search(self):
-        if self.model.present_table_type == "Network":
-            self.view.all_attributes_in_table_for_search_display(("Name", "Owner"), self.model.present_table_type)
-        elif self.model.present_table_type == "Cinema":
-            self.view.all_attributes_in_table_for_search_display(
-                ("Network", "Address", "NumberOfHalls", "GenNumberOfSeats"),self.model.present_table_type)
-        elif self.model.present_table_type == "Session":
-            self.view.all_attributes_in_table_for_search_display(["HallNumber"],self.model.present_table_type)
-        elif self.model.present_table_type == "Film":
-            self.view.all_attributes_in_table_for_search_display(
-                    ("Name", "Genre", "Year", "Budget", "Country", "Duration"),self.model.present_table_type)
-        elif self.model.present_table_type == "Cinema-Session":
-            self.view.all_attributes_in_table_for_search_display(["CinemaID"],self.model.present_table_type)
-
-        while True:
-            attribute_name = str(input())
-            if not (attribute_name == "Name" or attribute_name == "Owner" or attribute_name == "Network"
-            or attribute_name == "Address" or attribute_name == "Genre"
-            or attribute_name == "Country" or attribute_name == "Year"
-            or attribute_name == "Budget" or attribute_name == "Duration"
-            or attribute_name == "HallNumber" or attribute_name == "NumberOfHalls"
-            or attribute_name == "GenNumberOfSeats" or attribute_name == "CinemaID"):
-                print("Error:enter one of suggested attribute names:\n")
-                continue
-            return attribute_name
-
-    def select_attributes_for_dynamic_search(self, list_with_table_names):
-        array_with_attributes = []
-        for count in range(2):
-            if list_with_table_names[count] == "Network":
-                self.view.all_attributes_in_table_for_search_display(("Name", "Owner"), list_with_table_names[count])
-            elif list_with_table_names[count] == "Cinema":
-                self.view.all_attributes_in_table_for_search_display(
-                    ("Network", "Address", "NumberOfHalls", "GenNumberOfSeats"), list_with_table_names[count])
-            elif list_with_table_names[count] == "Session":
-                self.view.all_attributes_in_table_for_search_display(("ID", "Start", "Film", "HallNumber"),
-                                                                     list_with_table_names[count])
-            elif list_with_table_names[count] == "Film":
-                self.view.all_attributes_in_table_for_search_display(
-                    ("ID", "Name", "Genre", "Year", "Budget", "Country", "Duration", "Oscar"),
-                    list_with_table_names[count])
-
-            while True:
-                attribute_name = str(input())
-
-                if (attribute_name == "Name" or attribute_name == "Owner" or attribute_name == "Network"
-                        or attribute_name == "Address" or attribute_name == "Genre"
-                        or attribute_name == "Country" or attribute_name == "Oscar"):
-                    array_with_attributes.append(str(attribute_name))
-
-                elif (attribute_name == "ID" or attribute_name == "Year" or attribute_name == "Budget" or
-                attribute_name == "Duration" or attribute_name == "Start" or attribute_name == "HallNumber"
-                or attribute_name == "Film" or attribute_name == "NumberOfHalls"
-                or attribute_name == "GenNumberOfSeats"):
-                    array_with_attributes.append("{} Lower Bound".format(attribute_name))
-                    array_with_attributes.append("{} Upper Bound".format(attribute_name))
-
-                else:
-                    print("Error:enter one of suggested attribute names:\n")
-                    continue
-                break
-        return array_with_attributes
-
-    def dynamic_search(self):
-        while True:
-            list_with_entered_tables = self.enter_items(("First table", "Second table"))
-            if not ((list_with_entered_tables[0] == "Cinema" and list_with_entered_tables[1] == "Session")or(
-            list_with_entered_tables[0] == "Network" and list_with_entered_tables[1] == "Cinema")or(
-            list_with_entered_tables[0] == "Film" and list_with_entered_tables[1] == "Session")or(
-            list_with_entered_tables[0] == "Cinema" and list_with_entered_tables[1] == "Network")or(
-            list_with_entered_tables[0] == "Session" and list_with_entered_tables[1] == "Cinema")or(
-            list_with_entered_tables[0] == "Session" and list_with_entered_tables[1] == "Film")):
-                self.view.message_print("Enter two tables connected directly or through intermediary table\n")
-            else:
-                break
-
-        array_with_selected_attributes = self.select_attributes_for_dynamic_search(list_with_entered_tables)
-        list_with_entered_attributes = self.enter_items(array_with_selected_attributes)
-        items = self.model.dynamic_search(array_with_selected_attributes,list_with_entered_attributes,
-                                          list_with_entered_tables)
-        if items.rowcount == 0:
-            self.view.message_print("There aren't any results in table matching input conditions\n")
-        else:
-            self.view.table_rows_display(items)
 
     def data_random(self):
         g = Generic('en')
@@ -422,113 +268,112 @@ class Controller(object):
             if k % 1000 == 0:
                 self.model.connection.commit()
 
-
-def validate_input(attr_name, attr_value):
-    bound_check = list(attr_name.split(' '))
-    if len(bound_check) > 1:
-        if bound_check[1] == "Lower" or bound_check[1] == "Upper":
-            attr_name = bound_check[0]
-    if attr_name.find("table") != -1:
-        if (attr_value == "Network" or attr_value =="Cinema" or attr_value == "Session"
-        or attr_value == "Cinema-Session" or  attr_value == "Film"):
-            return True
-        return False
-    if attr_name == "ID":
-        if attr_value.isdecimal():
-            return True
-    elif attr_name == "Year":
-        if attr_value.isdecimal():
-            return True
-    elif attr_name == "Budget":
-        li = list(attr_value.split(" "))
-        if len(li) == 2:
-            if li[0].isdecimal() and (li[1] == "UAH" or li[1] == "USD" or li[1] == "EUR" or li[1] == "GBP"):
-                return True
-    elif attr_name == "Duration":
-        li = list(attr_value.split(" "))
-        if len(li) == 2:
-            if li[0].isdecimal() and li[1] == "min":
-                return True
-    elif attr_name == "Start":
-        li = list(attr_value.split(" "))
-        if len(li) == 2:
-            li_data = list(li[0].split("-"))
-            li_time = list(li[1].split(":"))
-            if (li_data[0].isdecimal() and li_data[1].isdecimal and li_data[2].isdecimal() and li_time[0].isdecimal()
-            and li_time[1].isdecimal() and li_time[2].isdecimal()):
-                if '13' > li_data[1] and li_data[2]<'31' and li_time[0]<'24' and li_time[1]<'60' and li_time[2]<'60':
+    def validate_input(self,attr_name, attr_value):
+        bound_check = list(attr_name.split(' '))
+        if len(bound_check) > 1:
+            if bound_check[1] == "Lower" or bound_check[1] == "Upper":
+                attr_name = bound_check[0]
+            if attr_name.find("table") != -1:
+                if (attr_value == "Network" or attr_value =="Cinema" or attr_value == "Session"
+                or attr_value == "Cinema-Session" or  attr_value == "Film"):
                     return True
-    elif attr_name == "HallNumber":
-        if attr_value.isdecimal():
-            return True
-    elif attr_name == "Film":
-        if attr_value.isdecimal():
-            return True
-    elif attr_name == "NumberOfHalls":
-        if attr_value.isdecimal():
-            return True
-    elif attr_name == "GenNumberOfSeats":
-        if attr_value.isdecimal():
-            return True
-    elif attr_name == "Name":
-        li = list(attr_value.split(" "))
-        for item in li:
-            if not item.isalnum():
                 return False
-        return True
-    elif attr_name == "Owner":
-        li = list(attr_value.split(" "))
-        for item in li:
-            if not item.isalpha() or not item[0].isupper:
-                return False
-        return True
-    elif attr_name == "Network":
-        li = list(attr_value.split(" "))
-        for item in li:
-            if not item.isalnum():
-                return False
-        return True
-    elif attr_name == "Address":
-        li = list(attr_value.split(","))
-        if len(li) == 3:
-            li0 = li[0].split(" ")
-            for part in li0:
-                if not part.isalpha():
-                    return False
-            li1 = li[1].split(" ")
-            for part in li1:
-                if not part.isalpha():
-                    return False
-            if li[2].isdecimal():
+            if attr_name == "ID":
+                if attr_value.isdecimal():
+                    return True
+            elif attr_name == "Year":
+                if attr_value.isdecimal():
+                    return True
+            elif attr_name == "Budget":
+                li = list(attr_value.split(" "))
+                if len(li) == 2:
+                    if li[0].isdecimal() and (li[1] == "UAH" or li[1] == "USD" or li[1] == "EUR" or li[1] == "GBP"):
+                        return True
+            elif attr_name == "Duration":
+                li = list(attr_value.split(" "))
+                if len(li) == 2:
+                    if li[0].isdecimal() and li[1] == "min":
+                        return True
+            elif attr_name == "Start":
+                li = list(attr_value.split(" "))
+                if len(li) == 2:
+                    li_data = list(li[0].split("-"))
+                    li_time = list(li[1].split(":"))
+                    if (li_data[0].isdecimal() and li_data[1].isdecimal and li_data[2].isdecimal() and li_time[0].isdecimal()
+                    and li_time[1].isdecimal() and li_time[2].isdecimal()):
+                        if '13' > li_data[1] and li_data[2]<'31' and li_time[0]<'24' and li_time[1]<'60' and li_time[2]<'60':
+                            return True
+            elif attr_name == "HallNumber":
+                if attr_value.isdecimal():
+                    return True
+            elif attr_name == "Film":
+                if attr_value.isdecimal():
+                    return True
+            elif attr_name == "NumberOfHalls":
+                if attr_value.isdecimal():
+                    return True
+            elif attr_name == "GenNumberOfSeats":
+                if attr_value.isdecimal():
+                    return True
+            elif attr_name == "Name":
+                li = list(attr_value.split(" "))
+                for item in li:
+                    if not item.isalnum():
+                        return False
                 return True
-        return False
-    elif attr_name == "Genre":
-        if attr_value.isalpha():
-            return True
-    elif attr_name == "Country":
-        if attr_value.isalpha():
-            return True
-    elif attr_name == "Oscar":
-        if attr_value == "True" or attr_value == "False":
-            return True
-        return False
-    elif attr_name == "CinemaID":
-        if attr_value.isdecimal():
-            return True
-        return False
-    elif attr_name == "SessionID":
-        if attr_value.isdecimal():
-            return True
-        return False
-    elif attr_name == "Phrase":
-        return True
-    elif attr_name == "Words":
-        words = list(attr_value.split(","))
-        for word in words:
-            subwords = list(word.split(" "))
-            for subword in subwords:
-                if not subword.isalnum():
-                    return False
-        return True
+            elif attr_name == "Owner":
+                li = list(attr_value.split(" "))
+                for item in li:
+                    if not item.isalpha() or not item[0].isupper:
+                        return False
+                return True
+            elif attr_name == "Network":
+                li = list(attr_value.split(" "))
+                for item in li:
+                    if not item.isalnum():
+                        return False
+                return True
+            elif attr_name == "Address":
+                li = list(attr_value.split(","))
+                if len(li) == 3:
+                    li0 = li[0].split(" ")
+                    for part in li0:
+                        if not part.isalpha():
+                            return False
+                    li1 = li[1].split(" ")
+                    for part in li1:
+                        if not part.isalpha():
+                            return False
+                    if li[2].isdecimal():
+                        return True
+                return False
+            elif attr_name == "Genre":
+                if attr_value.isalpha():
+                    return True
+            elif attr_name == "Country":
+                if attr_value.isalpha():
+                    return True
+            elif attr_name == "Oscar":
+                if attr_value == "True" or attr_value == "False":
+                    return True
+                return False
+            elif attr_name == "CinemaID":
+                if attr_value.isdecimal():
+                    return True
+                return False
+            elif attr_name == "SessionID":
+                if attr_value.isdecimal():
+                    return True
+                return False
+            elif attr_name == "Phrase":
+                return True
+            elif attr_name == "Words":
+                words = list(attr_value.split(","))
+                for word in words:
+                    subwords = list(word.split(" "))
+                    for subword in subwords:
+                        if not subword.isalnum():
+                            return False
+                return True
 
 
