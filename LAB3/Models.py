@@ -14,7 +14,7 @@ class Film(Base):
     Budget = Column(Text)
     Country = Column(Text)
     Duration = Column(Text)
-    Oscar = Column(Boolean)
+    Oscar = Column(Boolean,default=False)
 
 
 

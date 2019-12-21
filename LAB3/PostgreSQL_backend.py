@@ -41,7 +41,7 @@ def insert_one_orm(Session,list):
 
     session = Session()
     film = Film(Name = list[0], Genre = list[1], Year = list[2], Budget = list[3], Country = list[4], Duration = list[5]
-                ,Oscar = Boolean(list[6]))
+                ,Oscar = bool(list[6]))
     session.add(film)
     session.commit()
     session.close()
@@ -93,11 +93,15 @@ def delete_one(cursor, table_name, pr_key):
 def delete_one_orm(Session,pr_key):
     session = Session()
     film = session.query(Film).filter(Film.ID == pr_key).first()
+    if film is None:
+        session.close()
+        return 0
+
     session.delete(film)
     session.commit()
     session.close()
 
-    return film.count
+    return 1
 
 
 def delete_all(cursor,table_name):
@@ -107,12 +111,12 @@ def delete_all(cursor,table_name):
 
 def delete_all_orm(Session):
     session = Session()
-    films = session.query(Film).all()
-    session.delete(films)
+
+    count = session.query(Film).delete()
     session.commit()
     session.close()
 
-    return films.count
+    return count
 
 
 def update_item(cursor, table_name, list):
@@ -138,12 +142,16 @@ def update_item(cursor, table_name, list):
 def update_item_orm(Session,list):
     session = Session()
     film = session.query(Film).filter(Film.ID == list[0]).first()
+    if film is None:
+        session.close()
+        return 0
+
     film.Name,film.Genre,film.Year,film.Budget,film.Country,film.Duration = list[1],list[2],list[3],list[4],list[5],\
                                                                             list[6]
     session.commit()
     session.close()
 
-    return film.count
+    return 1
 
 
 def connect_to_db():
