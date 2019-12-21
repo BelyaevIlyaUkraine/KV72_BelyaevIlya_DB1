@@ -97,9 +97,13 @@ def delete_one_orm(Session,pr_key):
     session.commit()
     session.close()
 
+    return film.count
+
+
 def delete_all(cursor,table_name):
     cursor.execute("""DELETE FROM "{}" """.format(table_name))
     return cursor.rowcount
+
 
 def delete_all_orm(Session):
     session = Session()
@@ -107,6 +111,9 @@ def delete_all_orm(Session):
     session.delete(films)
     session.commit()
     session.close()
+
+    return films.count
+
 
 def update_item(cursor, table_name, list):
     if table_name == "Network":
@@ -140,6 +147,8 @@ def update_item_orm(Session,list):
                                                                             list[6]
     session.commit()
     session.close()
+
+    return film.count
 
 
 def connect_to_db():
