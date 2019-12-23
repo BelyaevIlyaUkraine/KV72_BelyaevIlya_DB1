@@ -60,3 +60,10 @@ class ModelPostgreSQL(object):
     def disconnect_from_db(self):
         PostgreSQL_backend.disconnect_from_db(self.connection,self.cursor)
 
+
+    def search_item(self,item,pr_key_mode,not_default_table=None):
+        if pr_key_mode:
+            return PostgreSQL_backend.select_item(self.cursor,self.present_table_type,item,pr_key_mode)
+        else:
+            return PostgreSQL_backend.select_item(self.cursor,not_default_table,item,pr_key_mode)
+

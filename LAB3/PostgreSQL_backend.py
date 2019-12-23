@@ -172,6 +172,22 @@ def disconnect_from_db(connection,cursor):
     print("Connection with PostgreSQL is closed")
 
 
+def select_item(cursor,table_name,item,mode):
+    table_name = scrub(table_name)
+    if mode:
+        if table_name == "Cinema":
+            cursor.execute(""" SELECT * FROM "{}" WHERE "Address" = '{}' """.format(table_name, item))
+        elif table_name == "Network":
+            cursor.execute(""" SELECT * FROM "{}" WHERE "Name" = '{}' """.format(table_name,item))
+        else:
+            cursor.execute("""SELECT * FROM "{}" WHERE "ID" = '{}' """.format(table_name,item))
+    else:
+        cursor.execute("""SELECT "{}" FROM "{}" """.format(item,table_name))
+        return cursor.fetchall()
+
+    return cursor
+
+
 
 
 
