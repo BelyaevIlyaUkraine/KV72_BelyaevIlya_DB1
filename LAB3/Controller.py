@@ -1,6 +1,6 @@
 from mimesis import Generic
 import random
-
+import datetime
 
 class Controller(object):
     def __init__(self, model, view):
@@ -184,8 +184,8 @@ class Controller(object):
                 return
 
         chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-
-        for k in range(10000):
+        previous_date = datetime.datetime.today()
+        for k in range(300000):
             array_with_attributes = []
             count = 0
             if self.model.present_table_type == "Network":
@@ -222,7 +222,15 @@ class Controller(object):
                     break
 
             elif self.model.present_table_type == "Session":
-                array_with_attributes.append(str(g.datetime.datetime()))
+                if previous_date.day + 1 == 29:
+                    if previous_date.month == 12:
+                        date = datetime.datetime(previous_date.year + 1, 1,1)
+                    else:
+                        date = datetime.datetime(previous_date.year,previous_date.month + 1,1)
+                else:
+                    date = datetime.datetime(previous_date.year,previous_date.month,previous_date.day + 1)
+                array_with_attributes.append(str(date))
+                previous_date = date
                 array_with_attributes.append(g.random.choice(list_for_Session))
                 array_with_attributes[1] = array_with_attributes[1][0]
                 array_with_attributes.append(g.random.randint(1, 4))
