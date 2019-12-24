@@ -2,14 +2,23 @@ from mimesis import Generic
 import random
 import datetime
 
+
 class Controller(object):
     def __init__(self, model, view):
-        self.model = model
-        self.view = view
+        self._model = model
+        self._view = view
+
+    @property
+    def model(self):
+        return self._model
+
+    @property
+    def view(self):
+        return self._view
 
     def show_items(self):
         items = self.model.read_items()
-        if self.model.present_table_type == "Film":
+        if self.model.orm_session is not None:
             if items.count:
                 self.view.table_rows_display_orm(items)
                 return

@@ -25,9 +25,8 @@ class View(object):
 
     @staticmethod
     def table_rows_display_orm(items):
-        for film in items:
-            print("({},{},{},{},{},{},{},{})\n".format(film.ID,film.Name,film.Genre,film.Year,film.Budget,film.Country,
-                                                    film.Duration,film.Oscar))
+        for item in items:
+            print(item.__repr__())
 
     @staticmethod
     def question_about_end_display():

@@ -1,4 +1,5 @@
-from Models import *
+from Models import Network,Cinema,Cinema_Session,Film
+from Models import Session as Sessn
 import psycopg2
 from sqlalchemy.orm import *
 from sqlalchemy import create_engine
@@ -37,12 +38,22 @@ def insert_one(cursor, table_name, list):
             VALUES ('{}', '{}')""".format(list[0], list[1]))
 
 
-def insert_one_orm(Session,list):
+def insert_one_orm(Session,list,table_name):
 
     session = Session()
-    film = Film(Name = list[0], Genre = list[1], Year = list[2], Budget = list[3], Country = list[4], Duration = list[5]
-                ,Oscar = bool(list[6]))
-    session.add(film)
+
+    if table_name == "Film":
+        table_item = Film(Name = list[0], Genre = list[1], Year = list[2], Budget = list[3],
+                          Country = list[4], Duration = list[5],Oscar = bool(list[6]))
+    elif table_name == "Network":
+        table_item = Network(Name = list[0],Owner = list[1])
+    elif table_name == "Cinema":
+        table_item = Cinema(Network = list[0],Address = list[1],NumberOfHalls = list[2], GenNumberOfSeats = list[3])
+    elif table_name == "Session":
+        table_item = Sessn(Start = (list[0]),Film = list[1],HallNumber = list[2])
+    else:
+        table_item = Cinema_Session(CinemaID = int(list[0]),SessionID = int(list[1]))
+    session.add(table_item)
     session.commit()
     session.close()
 
@@ -55,12 +66,21 @@ def select_all(cursor, table_name):
     return cursor
 
 
-def select_all_orm(Session):
+def select_all_orm(Session,table_name):
     session = Session()
-    films = session.query(Film).all()
+    if table_name == "Network":
+        table_item = session.query(Network).all()
+    elif table_name == "Cinema":
+        table_item = session.query(Cinema).all()
+    elif table_name == "Film":
+        table_item = session.query(Film).all()
+    elif table_name == "Session":
+        table_item = session.query(Sessn).all()
+    else:
+        table_item = session.query(Cinema_Session).all()
     session.close()
 
-    return films
+    return table_item
 
 
 def delete_one(cursor, table_name, pr_key):
@@ -90,14 +110,23 @@ def delete_one(cursor, table_name, pr_key):
     return cursor.rowcount
 
 
-def delete_one_orm(Session,pr_key):
+def delete_one_orm(Session,table_name,pr_key):
     session = Session()
-    film = session.query(Film).filter(Film.ID == pr_key).first()
-    if film is None:
+    if table_name == "Network":
+        table_item = session.query(Network).filter(Network.Name == pr_key).first()
+    elif table_name == "Cinema":
+        table_item = session.query(Cinema).filter(Cinema.Address == pr_key).first()
+    elif table_name == "Session":
+        table_item = session.query(Sessn).filter(Sessn.ID == pr_key).first()
+    elif table_name == "Cinema-Session":
+        table_item = session.query(Cinema_Session).filter(Cinema_Session.ID == pr_key).first()
+    else:
+        table_item = session.query(Film).filter(Film.ID == pr_key).first()
+    if table_item is None:
         session.close()
         return 0
 
-    session.delete(film)
+    session.delete(table_item)
     session.commit()
     session.close()
 
@@ -109,10 +138,18 @@ def delete_all(cursor,table_name):
     return cursor.rowcount
 
 
-def delete_all_orm(Session):
+def delete_all_orm(Session,table_name):
     session = Session()
-
-    count = session.query(Film).delete()
+    if table_name == "Network":
+        count = session.query(Network).delete()
+    elif table_name == "Cinema":
+        count = session.query(Cinema).delete()
+    elif table_name == "Film":
+        count = session.query(Film).delete()
+    elif table_name == "Session":
+        count = session.query(Sessn).delete()
+    else:
+        count = session.query(Cinema_Session).delete()
     session.commit()
     session.close()
 
@@ -139,15 +176,40 @@ def update_item(cursor, table_name, list):
     return cursor.rowcount
 
 
-def update_item_orm(Session,list):
+def update_item_orm(Session,table_name,list):
     session = Session()
-    film = session.query(Film).filter(Film.ID == list[0]).first()
-    if film is None:
-        session.close()
-        return 0
 
-    film.Name,film.Genre,film.Year,film.Budget,film.Country,film.Duration = list[1],list[2],list[3],list[4],list[5],\
-                                                                            list[6]
+    if table_name == "Film":
+        table_item = session.query(Film).filter(Film.ID == list[0]).first()
+        if table_item is None:
+            session.close()
+            return 0
+        table_item.Name,table_item.Genre,table_item.Year,table_item.Budget,table_item.Country,table_item.Duration,\
+        table_item.Oscar= list[1],list[2],list[3],list[4],list[5],list[6],bool(list[7])
+    elif table_name == "Network":
+        table_item = session.query(Network).filter(Network.Name == list[0]).first()
+        if table_item is None:
+            session.close()
+            return 0
+        table_item.Owner = list[1]
+    elif table_name == "Cinema":
+        table_item = session.query(Cinema).filter(Cinema.Address == list[1]).first()
+        if table_item is None:
+            session.close()
+            return 0
+        table_item.Network,table_item.NumberOfHalls,table_item.GenNumberOfSeats = list[0],list[2],list[3]
+    elif table_name == "Session":
+        table_item = session.query(Sessn).filter(Sessn.ID == list[0]).first()
+        if table_item is None:
+            session.close()
+            return 0
+        table_item.Start,table_item.Film,table_item.HallNumber = list[1],list[2],list[3]
+    else:
+        table_item = session.query(Cinema_Session).filter(Cinema_Session.ID == list[0]).first()
+        if table_item is None:
+            session.close()
+            return 0
+        table_item.CinemaID,table_item.SessionID = list[1],list[2]
     session.commit()
     session.close()
 
