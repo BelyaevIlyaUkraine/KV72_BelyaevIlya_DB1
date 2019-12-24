@@ -194,7 +194,7 @@ class Controller(object):
 
         chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
         previous_date = datetime.datetime.today()
-        for k in range(300000):
+        for k in range(2000):
             array_with_attributes = []
             count = 0
             if self.model.present_table_type == "Network":

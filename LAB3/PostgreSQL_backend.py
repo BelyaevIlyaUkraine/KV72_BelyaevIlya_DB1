@@ -1,4 +1,4 @@
-from Models import Network,Cinema,Cinema_Session,Film
+from Models import *
 from Models import Session as Sessn
 import psycopg2
 from sqlalchemy.orm import *
@@ -33,12 +33,17 @@ def insert_one(cursor, table_name, list):
         cursor.execute("""INSERT INTO "Session" ("Start","Film","HallNumber") 
             VALUES ('{}', '{}', '{}')""".format (list[0], list[1], list[2]))
 
+    elif table_name == "Film":
+        cursor.execute("""INSERT INTO "Film" ("Name","Genre","Year","Budget","Country","Duration","Oscar") 
+        VALUES ('{}','{}','{}','{}','{}','{}','{}')""".format(list[0], list[1], list[2],
+                                                              list[3], list[4], list[5], list[6]))
+
     else:
         cursor.execute("""INSERT INTO "Cinema-Session" ("CinemaID","SessionID") 
             VALUES ('{}', '{}')""".format(list[0], list[1]))
 
 
-def insert_one_orm(Session,list,table_name):
+def insert_one_orm(Session,table_name,list):
 
     session = Session()
 
@@ -50,9 +55,9 @@ def insert_one_orm(Session,list,table_name):
     elif table_name == "Cinema":
         table_item = Cinema(Network = list[0],Address = list[1],NumberOfHalls = list[2], GenNumberOfSeats = list[3])
     elif table_name == "Session":
-        table_item = Sessn(Start = (list[0]),Film = list[1],HallNumber = list[2])
+        table_item = Sessn(Start = list[0],Film = list[1],HallNumber = list[2])
     else:
-        table_item = Cinema_Session(CinemaID = int(list[0]),SessionID = int(list[1]))
+        table_item = Cinema_Session(CinemaID = list[0],SessionID = list[1])
     session.add(table_item)
     session.commit()
     session.close()
@@ -95,6 +100,9 @@ def delete_one(cursor, table_name, pr_key):
     def delete_one_session():
         cursor.execute("""DELETE FROM "Session" WHERE "ID" = '{}' """.format(pr_key))
 
+    def delete_one_film():
+        cursor.execute("""DELETE FROM "Film" WHERE "ID" = '{}' """.format(pr_key))
+
     def delete_one_cinema_session():
         cursor.execute("""DELETE FROM "Cinema-Session" WHERE "ID" = '{}' """.format(pr_key))
 
@@ -104,6 +112,8 @@ def delete_one(cursor, table_name, pr_key):
         delete_one_cinema()
     elif table_name == "Session":
         delete_one_session()
+    elif table_name == "Film":
+        delete_one_film()
     elif table_name == "Cinema-Session":
         delete_one_cinema_session()
 
@@ -168,6 +178,11 @@ def update_item(cursor, table_name, list):
     elif table_name == "Session":
         cursor.execute("""UPDATE "Session" SET "Start" = '{}' ,"Film" = '{}', "HallNumber" = '{}' WHERE 
             "ID" = '{}'  """.format(list[1], list[2], list[3], list[0]))
+
+    elif table_name == "Film":
+        cursor.execute("""UPDATE "Film" SET "Name" = '{}',"Genre" = '{}',"Year" = '{}',"Budget" = '{}',
+                "Country" = '{}' ,"Duration" = '{}' WHERE "ID" = '{}' """
+                       .format(list[1], list[2], list[3], list[4], list[5], list[6], list[0]))
 
     elif table_name == "Cinema-Session":
         cursor.execute("""UPDATE "Cinema-Session" SET "CinemaID" = '{}',"SessionID" = '{}'

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text, Boolean,ForeignKey,TIMESTAMP
+from sqlalchemy import Column, Integer, Text, BOOLEAN,ForeignKey,TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship,backref
 
@@ -26,7 +26,8 @@ class Cinema(Base):
     NumberOfHalls = Column(Text)
     GenNumberOfSeats = Column(Text)
 
-    cinemas = relationship("Network",backref=backref("cinemas"))
+    #network = relationship("Network",backref=backref("cinemas"))
+    #sessn = relationship("Session",secondary = "Cinema-Session")
 
     def __str__(self):
         return "({},{},{},{})\n".format(self.Network,self.Address,self.NumberOfHalls,self.GenNumberOfSeats)
@@ -46,7 +47,7 @@ class Film(Base):
     Budget = Column(Text)
     Country = Column(Text)
     Duration = Column(Text)
-    Oscar = Column(Boolean,default=False)
+    Oscar = Column(BOOLEAN)
 
     def __str__(self):
         return "({},{},{},{},{},{},{},{})\n".format(self.ID,self.Name,self.Genre,self.Year,self.Budget,self.Country,
@@ -64,20 +65,21 @@ class Session(Base):
     Film = Column(Integer,ForeignKey('Film.ID'))
     HallNumber = Column(Text)
 
-    film = relationship("Film",backref = backref('sessions'))
-
     def __str__(self):
         return "({},{},{},{})\n".format(self.ID,self.Start,self.Film,self.HallNumber)
 
     def __repr__(self):
         return str(self)
 
+    #film = relationship("Film", backref=backref("sessions"))
+    #cinem = relationship("Cinema",secondary = "Cinema-Session")
+
 
 class Cinema_Session(Base):
     __tablename__ = "Cinema-Session"
 
     ID = Column(Integer,primary_key = True)
-    CinemaID = Column(Text,ForeignKey('Session.Address'))
+    CinemaID = Column(Text,ForeignKey('Cinema.Address'))
     SessionID = Column(Integer,ForeignKey('Session.ID'))
 
     def __str__(self):
