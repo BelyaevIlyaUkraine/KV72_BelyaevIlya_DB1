@@ -9,7 +9,7 @@
 [Опис структури БД](https://github.com/BelyaevIlyaUkraine/KV72_BelyaevIlya_DB/blob/master/LAB1/DB%20structure%20describing.docx)
 **Сутності:**
 1)Мережа:
-'''
+```
  -- Table: public."Network"
 
 -- DROP TABLE public."Network";
@@ -37,4 +37,4 @@ CREATE TRIGGER thebesttriggerinhistory
     ON public."Network"
     FOR EACH ROW
     EXECUTE PROCEDURE public.func();
-'''
+```
