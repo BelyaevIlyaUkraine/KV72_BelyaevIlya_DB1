@@ -111,3 +111,29 @@ CREATE INDEX "BRIN_idx"
     ("Start")
     TABLESPACE pg_default;
 ```
+4)Фільм
+```
+-- Table: public."Film"
+
+-- DROP TABLE public."Film";
+
+CREATE TABLE public."Film"
+(
+    "ID" integer NOT NULL DEFAULT nextval('"Film_ID_seq"'::regclass),
+    "Name" text COLLATE pg_catalog."default" NOT NULL,
+    "Genre" text COLLATE pg_catalog."default" NOT NULL,
+    "Year" text COLLATE pg_catalog."default" NOT NULL,
+    "Budget" text COLLATE pg_catalog."default" NOT NULL,
+    "Country" text COLLATE pg_catalog."default" NOT NULL,
+    "Duration" text COLLATE pg_catalog."default" NOT NULL,
+    "Oscar" boolean NOT NULL,
+    CONSTRAINT "Film_pkey" PRIMARY KEY ("ID")
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."Film"
+    OWNER to postgres;
+```
