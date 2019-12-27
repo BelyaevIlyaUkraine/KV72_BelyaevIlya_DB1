@@ -137,3 +137,35 @@ TABLESPACE pg_default;
 ALTER TABLE public."Film"
     OWNER to postgres;
 ```
+
+5)Кінотеатр-Сеанс
+```
+-- Table: public."Cinema-Session"
+
+-- DROP TABLE public."Cinema-Session";
+
+CREATE TABLE public."Cinema-Session"
+(
+    "ID" integer NOT NULL DEFAULT nextval('"Cinema-Session_ID_seq"'::regclass),
+    "CinemaID" text COLLATE pg_catalog."default" NOT NULL,
+    "SessionID" integer NOT NULL,
+    CONSTRAINT "Cinema-Session_pkey" PRIMARY KEY ("ID"),
+    CONSTRAINT "CinemaID_SessionID_UN" UNIQUE ("CinemaID", "SessionID")
+,
+    CONSTRAINT "CinemaID_FK" FOREIGN KEY ("CinemaID")
+        REFERENCES public."Cinema" ("Address") MATCH FULL
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT "SessionID_FK" FOREIGN KEY ("SessionID")
+        REFERENCES public."Session" ("ID") MATCH FULL
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."Cinema-Session"
+    OWNER to postgres;
+```
