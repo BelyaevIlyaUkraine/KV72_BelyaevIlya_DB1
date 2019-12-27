@@ -40,3 +40,38 @@ CREATE TRIGGER thebesttriggerinhistory
     FOR EACH ROW
     EXECUTE PROCEDURE public.func();
 ```
+2)Кінотеатр
+```
+-- Table: public."Cinema"
+
+-- DROP TABLE public."Cinema";
+
+CREATE TABLE public."Cinema"
+(
+    "Network" text COLLATE pg_catalog."default" NOT NULL,
+    "Address" text COLLATE pg_catalog."default" NOT NULL,
+    "NumberOfHalls" text COLLATE pg_catalog."default" NOT NULL,
+    "GenNumberOfSeats" text COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT "Cinema_pkey" PRIMARY KEY ("Address"),
+    CONSTRAINT "NetworkFK" FOREIGN KEY ("Network")
+        REFERENCES public."Network" ("Name") MATCH FULL
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."Cinema"
+    OWNER to postgres;
+
+-- Index: gennumberofseats_idx
+
+-- DROP INDEX public.gennumberofseats_idx;
+
+CREATE INDEX gennumberofseats_idx
+    ON public."Cinema" USING hash
+    ("GenNumberOfSeats" COLLATE pg_catalog."default")
+    TABLESPACE pg_default;
+```
