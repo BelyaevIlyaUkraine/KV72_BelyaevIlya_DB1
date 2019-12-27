@@ -171,3 +171,4 @@ TABLESPACE pg_default;
 ALTER TABLE public."Cinema-Session"
     OWNER to postgres;
 ```
+# Файли з командами,які стосуються індексів та тригера,лежать відповідно у папках Index SQL Commands та Trigger SQL Commands
