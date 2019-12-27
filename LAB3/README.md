@@ -75,3 +75,39 @@ CREATE INDEX gennumberofseats_idx
     ("GenNumberOfSeats" COLLATE pg_catalog."default")
     TABLESPACE pg_default;
 ```
+3)Сеанс
+
+```
+-- Table: public."Session"
+
+-- DROP TABLE public."Session";
+
+CREATE TABLE public."Session"
+(
+    "ID" integer NOT NULL DEFAULT nextval('"Session_ID_seq"'::regclass),
+    "Start" timestamp(0) without time zone NOT NULL,
+    "Film" integer NOT NULL,
+    "HallNumber" text COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT "Session_pkey" PRIMARY KEY ("ID"),
+    CONSTRAINT "FilmFK" FOREIGN KEY ("Film")
+        REFERENCES public."Film" ("ID") MATCH FULL
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."Session"
+    OWNER to postgres;
+
+-- Index: BRIN_idx
+
+-- DROP INDEX public."BRIN_idx";
+
+CREATE INDEX "BRIN_idx"
+    ON public."Session" USING brin
+    ("Start")
+    TABLESPACE pg_default;
+```
