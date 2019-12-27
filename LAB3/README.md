@@ -8,6 +8,8 @@
 
 **[Опис структури БД](https://github.com/BelyaevIlyaUkraine/KV72_BelyaevIlya_DB/blob/master/LAB1/DB%20structure%20describing.docx)**
 
+**[Додаток з роботою з індексами,тригером та транзакціями] (https://github.com/BelyaevIlyaUkraine/KV72_BelyaevIlya_DB/blob/master/LAB3/Extra.docx)**
+
 **Сутності:**
 
 1)**Мережа:**
