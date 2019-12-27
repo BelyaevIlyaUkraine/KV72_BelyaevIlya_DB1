@@ -10,7 +10,7 @@
 
 **Сутності:**
 
-1)Мережа:
+1)**Мережа:**
 ```
  -- Table: public."Network"
 
@@ -40,7 +40,7 @@ CREATE TRIGGER thebesttriggerinhistory
     FOR EACH ROW
     EXECUTE PROCEDURE public.func();
 ```
-2)Кінотеатр
+2)**Кінотеатр**
 ```
 -- Table: public."Cinema"
 
@@ -75,7 +75,7 @@ CREATE INDEX gennumberofseats_idx
     ("GenNumberOfSeats" COLLATE pg_catalog."default")
     TABLESPACE pg_default;
 ```
-3)Сеанс
+3)**Сеанс**
 
 ```
 -- Table: public."Session"
@@ -111,7 +111,7 @@ CREATE INDEX "BRIN_idx"
     ("Start")
     TABLESPACE pg_default;
 ```
-4)Фільм
+4)**Фільм**
 ```
 -- Table: public."Film"
 
@@ -138,7 +138,7 @@ ALTER TABLE public."Film"
     OWNER to postgres;
 ```
 
-5)Кінотеатр-Сеанс
+5)**Кінотеатр-Сеанс**
 ```
 -- Table: public."Cinema-Session"
 
